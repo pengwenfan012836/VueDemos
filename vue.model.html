@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://google.github.io/traceur-compiler/bin/traceur.js"></script>
+<script src="https://google.github.io/traceur-compiler/bin/BrowserSystem.js"></script>
+<script src="https://google.github.io/traceur-compiler/src/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+    <style type="text/css">
+    .table {
+        border:1px solid #999;
+        width: 500px;
+    }
+    .inputClass {
+        margin-bottom: 20px;
+    }
+    .es-grid {
+        margin:20px;
+    }
+    </style>
+</head>
+<body>
+    <script type="text/x-template" id="my-tree-template">
+        <li>
+            <h5>{{ model.name }} <span @click="toggleNode" v-if="isFloder">[ {{ open ? '-' : '+' }} ]</span></h5>
+            <ul v-show="open" v-if="isFloder">
+                <my-tree
+                v-for="(model, index) in model.children"
+                :model="model"
+                >
+                </my-tree>
+            </ul>
+        </li>
+    </script>
+    <div id="es-my-tree">
+        <my-tree
+        :model="treeData"></my-tree>
+    </div>
+    <script type="text/javascript">
+    </script>
+</body>
+</html>

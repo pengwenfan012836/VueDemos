@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://google.github.io/traceur-compiler/bin/traceur.js"></script>
+<script src="https://google.github.io/traceur-compiler/bin/BrowserSystem.js"></script>
+<script src="https://google.github.io/traceur-compiler/src/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+    <style type="text/css">
+        html, body {
+          font: 13px/18px sans-serif;
+        }
+        select {
+          min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div id="el"></div>
+
+    <!-- using string template here to work around HTML <option> placement restriction -->
+    <script type="text/x-template" id="demo-template">
+      <div>
+        <p>Selected: {{ selected }}</p>
+        <select2 :options="options" v-model="selected">
+          <option disabled value="0">Select one</option>
+        </select2>
+      </div>
+    </script>
+
+    <script type="text/x-template" id="select2-template">
+      <select>
+        <slot></slot>
+      </select>
+    </script>
+    <script type="text/javascript">
+        Vue.component('select2', {
+          props: ['options', 'value'],
+          template: '#select2-template',
+          mounted: function () {
+            var vm = this
+            $(this.$el)
+              // init select2
+              .select2({ data: this.options })
+              .val(this.value)
+              .trigger('change')
+              // emit event on change.
+              .on('change', function () {
+                vm.$emit('input', this.value)
+              })
+          },
+          watch: {
+            value: function (value) {
+              // update value
+              $(this.$el)
+                .val(value)
+                .trigger('change')
+            },
+            options: function (options) {
+              // update options
+              $(this.$el).empty().select2({ data: options })
+            }
+          },
+          destroyed: function () {
+            $(this.$el).off().select2('destroy')
+          }
+        })
+
+        var vm = new Vue({
+          el: '#el',
+          template: '#demo-template',
+          data: {
+            selected: 2,
+            options: [
+              { id: 1, text: 'Hello' },
+              { id: 2, text: 'World' }
+            ]
+          }
+        })
+    </script>
+</body>
+</html>

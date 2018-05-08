@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://google.github.io/traceur-compiler/bin/traceur.js"></script>
+<script src="https://google.github.io/traceur-compiler/bin/BrowserSystem.js"></script>
+<script src="https://google.github.io/traceur-compiler/src/bootstrap.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.13/vue.min.js"></script>
+    <style type="text/css">
+    .table {
+        border:1px solid #999;
+        width: 500px;
+    }
+    .inputClass {
+        margin-bottom: 20px;
+    }
+    .es-grid {
+        margin:20px;
+    }
+    </style>
+</head>
+<body>
+    <script type="text/x-template" id="my-grid-template">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td v-for="title in titles"
+                    @click="sort(title)">{{ title | capitalize }}</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in countData">
+                    <td v-for="col in row">{{ col }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+    <div id="es-my-grid">
+        <div :class="{'es-grid': true}">
+            <input type="text" v-model="searchQuery" name="searchKey" :class="{inputClass: true}">
+            <my-grid
+                :search-query="searchQuery"
+                :titles="titles"
+                :table-datas="tableDatas"
+                ></my-grid>
+        </div>
+    </div>
+    <script type="text/javascript">
+        Vue.component('my-grid', {
+            template: '#my-grid-template',
+            props: {
+                titles: Array,
+                tableDatas: Array,
+                searchQuery: String
+            },
+            data: function() {
+                var sortWay = {};
+                for (var i =0; i< this.titles.length; i++) {
+                    sortWay[this.titles[i]] = 1;
+                }
+                return {
+                    sortKey: '',
+                    sortWay: sortWay
+                }
+            },
+            computed: {
+                countData: function() {
+                    var data = this.tableDatas;
+                    var searchQuery = this.searchQuery;
+                    if (searchQuery) {
+                        temData = [];
+                        for (var i = data.length-1; i >= 0; i--) {
+                            for (var j in data[i]) {
+                                if ((data[i][j] +'').includes(searchQuery)) {
+                                    temData.push(data[i]);
+                                    break;
+                                }
+                            }
+                        }
+                        return temData;
+                    }
+                    /**
+                     * 当这里引入是一个对象/数组的时候，
+                     * 那会产生实时监听的效果么？不会
+                     * @type {[type]}
+                     */
+                    var sortKey = this.sortKey;
+                    var sortWay = this.sortWay[sortKey] || 1;
+                    if (sortKey) {
+                        data = data.slice().sort(function (a, b) {
+                            a = a[sortKey]
+                            b = b[sortKey]
+                            return (a === b ? 0 : a > b ? 1 : -1) * sortWay
+                        })
+                    }
+                    return data;
+                }
+            },
+            filters: {
+                capitalize: function(value) {
+                    console.log(value);
+                    return value.charAt(0).toUpperCase() + value.slice(1);
+                }
+            },
+            methods: {
+                sort: function(key) {
+                    this.sortKey = key;
+                    this.sortWay[key] = this.sortWay[key] * -1;
+                    console.log(key);
+                }
+            }
+        });
+        var my_grid = new Vue({
+            el: '#es-my-grid',
+            data: {
+                searchQuery: '',
+                titles: ['name', 'age'],
+                tableDatas: [{
+                    name: 'pwf',
+                    age: 12
+                }, {
+                    name: 'hyy',
+                    age: 23
+                }]
+            }
+        })
+    </script>
+</body>
+</html>
